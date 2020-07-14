@@ -10,8 +10,8 @@ class AES{
         private const val Nb = 4 // Number of columns comprising the State
 
         // Set of constants for AES-128
-        private const val Nr = 10   // Number of rounds
-        private const val Nk = 4    // Number of 32-bit words comprising the Cipher Key
+        private const val Nr = 10   // Number of rounds //12
+        private const val Nk = 4    // Number of 32-bit words comprising the Cipher Key //6
         private const val NUMBER_OF_WORDS = Nb * (Nr + 1)
     }
 
@@ -140,6 +140,7 @@ class AES{
         val w = Array(NUMBER_OF_WORDS) { Word.empty() }
         var temp: Word
 
+        //find w0 => w3
         for (i in 0 until Nk) {
             val baseIndex = i * 4
 
