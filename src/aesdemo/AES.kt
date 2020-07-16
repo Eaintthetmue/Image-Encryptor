@@ -4,14 +4,14 @@ import aesdemo.internal.Word
 import java.util.*
 import kotlin.experimental.xor
 
-class AES{
+class AES {
     companion object {
         private const val BLOCK_LENGHT_BYTE = 16
         private const val Nb = 4 // Number of columns comprising the State
 
         // Set of constants for AES-128
-        private const val Nr = 10   // Number of rounds //12
-        private const val Nk = 4    // Number of 32-bit words comprising the Cipher Key //6
+        private const val Nr = 12   // Number of rounds //12
+        private const val Nk = 6    // Number of 32-bit words comprising the Cipher Key //6
         private const val NUMBER_OF_WORDS = Nb * (Nr + 1)
     }
 
@@ -73,28 +73,43 @@ class AES{
     fun encrypt(plainText: ByteArray, key: ByteArray): ByteArray {
         expandKey(key)
         var cipher = plainText xor getRoundKey(0)
+        println("R[1]_Start = ${cipher.asHexString()}")
 
-        for (i in 1..9) {
+        for (i in 1..11) {
             cipher = subBytes(cipher)
+            println("R[$i]_S-Box = ${cipher.asHexString()}")
+
             cipher = shiftRows(cipher)
+            println("R[$i]_S-Row = ${cipher.asHexString()}")
+
             cipher = mixColumns(cipher)
+            println("R[$i]_M-Col = ${cipher.asHexString()}")
+
+            println()
 
             cipher = cipher xor getRoundKey(i)
+            println("R[${i+1}]_Start = ${cipher.asHexString()}")
         }
 
         cipher = subBytes(cipher)
-        cipher = shiftRows(cipher)
+        println("R[12]_S-Box = ${cipher.asHexString()}")
 
-        cipher = cipher xor getRoundKey(10)
+        cipher = shiftRows(cipher)
+        println("R[12]_S-Row = ${cipher.asHexString()}")
+
+        cipher = cipher xor getRoundKey(12)
+        println("R[13]_Start = ${cipher.asHexString()}")
+        println()
 
         return cipher
     }
 
     fun decrypt(cipher: ByteArray, key: ByteArray): ByteArray {
         expandKey(key)
-        var plainText = cipher xor getRoundKey(10)
+        var plainText = cipher xor getRoundKey(12)
 
-        for (i in 9 downTo 1) {
+
+        for (i in 11 downTo 1) {
             plainText = invShiftRows(plainText)
             plainText = invSubBytes(plainText)
 
@@ -133,6 +148,7 @@ class AES{
             sBox[row * 16 + col].toByte()
         }.toByteArray()
 
+
         return Word.fromByteArray(subWordArray)
     }
 
@@ -150,6 +166,8 @@ class AES{
                     key[baseIndex + 2],
                     key[baseIndex + 3]
             )
+
+         //   println("w$i = ${w[i].toString()}")
         }
 
         for (i in Nk until NUMBER_OF_WORDS) {
@@ -159,6 +177,7 @@ class AES{
                 temp = subWord(rotWord(temp)) xor rCon[i / Nk]
             } else if (Nk > 6 && i % Nk == 4) {
                 temp = subWord(temp)
+
             }
 
             w[i] = w[i - Nk] xor temp
@@ -215,28 +234,28 @@ class AES{
 
             out[baseIndex] =
                     (input[baseIndex] gmul 0x02) xor
-                            (input[baseIndex + 1] gmul 0x03) xor
-                            input[baseIndex + 2] xor
-                            input[baseIndex + 3]
+                    (input[baseIndex + 1] gmul 0x03) xor
+                    input[baseIndex + 2] xor
+                    input[baseIndex + 3]
 
             out[baseIndex + 1] =
                     input[baseIndex] xor
-                            (input[baseIndex + 1] gmul 0x02) xor
-                            (input[baseIndex + 2] gmul 0x03) xor
-                            input[baseIndex + 3]
+                    (input[baseIndex + 1] gmul 0x02) xor
+                    (input[baseIndex + 2] gmul 0x03) xor
+                    input[baseIndex + 3]
 
 
             out[baseIndex + 2] =
                     input[baseIndex] xor
-                            input[baseIndex + 1] xor
-                            (input[baseIndex + 2] gmul 0x02) xor
-                            (input[baseIndex + 3] gmul 0x03)
+                    input[baseIndex + 1] xor
+                    (input[baseIndex + 2] gmul 0x02) xor
+                    (input[baseIndex + 3] gmul 0x03)
 
             out[baseIndex + 3] =
                     (input[baseIndex] gmul 0x03) xor
-                            input[baseIndex + 1] xor
-                            input[baseIndex + 2] xor
-                            (input[baseIndex + 3] gmul 0x02)
+                    input[baseIndex + 1] xor
+                    input[baseIndex + 2] xor
+                    (input[baseIndex + 3] gmul 0x02)
         }
 
         return out
@@ -290,28 +309,28 @@ class AES{
 
             out[baseIndex] =
                     (input[baseIndex] gmul 0x0e) xor
-                            (input[baseIndex + 1] gmul 0x0b) xor
-                            (input[baseIndex + 2] gmul 0x0d) xor
-                            (input[baseIndex + 3] gmul 0x09)
+                    (input[baseIndex + 1] gmul 0x0b) xor
+                    (input[baseIndex + 2] gmul 0x0d) xor
+                    (input[baseIndex + 3] gmul 0x09)
 
             out[baseIndex + 1] =
                     (input[baseIndex] gmul 0x09) xor
-                            (input[baseIndex + 1] gmul 0x0e) xor
-                            (input[baseIndex + 2] gmul 0x0b) xor
-                            (input[baseIndex + 3] gmul 0x0d)
+                    (input[baseIndex + 1] gmul 0x0e) xor
+                    (input[baseIndex + 2] gmul 0x0b) xor
+                    (input[baseIndex + 3] gmul 0x0d)
 
 
             out[baseIndex + 2] =
                     (input[baseIndex] gmul 0x0d) xor
-                            (input[baseIndex + 1] gmul 0x09) xor
-                            (input[baseIndex + 2] gmul 0x0e) xor
-                            (input[baseIndex + 3] gmul 0x0b)
+                    (input[baseIndex + 1] gmul 0x09) xor
+                    (input[baseIndex + 2] gmul 0x0e) xor
+                    (input[baseIndex + 3] gmul 0x0b)
 
             out[baseIndex + 3] =
                     (input[baseIndex] gmul 0x0b) xor
-                            (input[baseIndex + 1] gmul 0x0d) xor
-                            (input[baseIndex + 2] gmul 0x09) xor
-                            (input[baseIndex + 3] gmul 0x0e)
+                    (input[baseIndex + 1] gmul 0x0d) xor
+                    (input[baseIndex + 2] gmul 0x09) xor
+                    (input[baseIndex + 3] gmul 0x0e)
         }
 
         return out

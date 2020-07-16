@@ -2,7 +2,7 @@ package aesdemo.internal
 
 import kotlin.experimental.xor
 
-data class Word(val w0: Byte, val w1: Byte, val w2: Byte, val w3: Byte) { // w4, w5
+data class Word(val w0: Byte, val w1: Byte, val w2: Byte, val w3: Byte) {
     companion object {
         fun empty() = Word(0, 0, 0, 0)
 
@@ -11,7 +11,7 @@ data class Word(val w0: Byte, val w1: Byte, val w2: Byte, val w3: Byte) { // w4,
                     array[0],
                     array[1],
                     array[2],
-                    array[3] //[4][5]
+                    array[3]
             )
         }
     }
